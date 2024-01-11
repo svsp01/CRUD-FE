@@ -18,6 +18,9 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
+import axios from 'axios';
+import { BASE_URL } from '@/config'
+import { useRouter } from 'next/navigation'
 import { Input } from "@/components/ui/input"
 
 
@@ -75,7 +78,31 @@ function DialogeForm({ open, close, data }: any) {
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         console.log(values, "entered values")
-        close()
+        const userData = {
+            name: {
+                firstname: values.firstname,
+                lastname: values.firstname,
+            },
+            email: values.email,
+            empId: values.empId,
+            gender: values.gender,
+            dateOfBirth: values.dateOfBirth,
+            phoneNumber: values.phoneNumber,
+            department: values.department,
+            position: values.position,
+            salary: values.salary,
+        };
+
+        axios.post(`${BASE_URL}/users/add`, userData)
+            .then(response => {
+                console.log('added successfully:', response.data);
+                // localStorage.setItem("token", response.data.token);
+                // router.push("/dashboard")
+                close()
+            })
+            .catch(error => {
+                console.error('Error creating user:', error);
+            });
     }
     return (
         <div>
