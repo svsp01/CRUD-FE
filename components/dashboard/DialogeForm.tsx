@@ -77,11 +77,10 @@ function DialogeForm({ open, close, data }: any) {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values, "entered values")
         const userData = {
             name: {
-                firstname: values.firstname,
-                lastname: values.firstname,
+                firstName: values.firstname,
+                lastName: values.lastname,
             },
             email: values.email,
             empId: values.empId,
@@ -92,6 +91,7 @@ function DialogeForm({ open, close, data }: any) {
             position: values.position,
             salary: values.salary,
         };
+        console.log(userData, "entered values")
 
         axios.post(`${BASE_URL}/users/add`, userData)
             .then(response => {

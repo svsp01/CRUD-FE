@@ -24,16 +24,6 @@ function LoginForm() {
 
     const router = useRouter()
 
-    const getUser = async () => {
-        const response = await fetch("http://127.0.0.1:5000/users");
-        const movies = await response.json();
-        console.log(movies);
-    }
-
-    useEffect(() => {
-        getUser()
-    }, [])
-
     const formSchema = z.object({
         email: z.string().min(2, {
             message: "Username must be at least 2 characters.",
