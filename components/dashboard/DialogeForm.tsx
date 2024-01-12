@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Dialog,
     DialogContent,
@@ -22,11 +22,13 @@ import axios from 'axios';
 import { BASE_URL } from '@/config'
 import { useRouter } from 'next/navigation'
 import { Input } from "@/components/ui/input"
+import moment from "moment"
+import userService from '@/services/userservices/usersService'
 
 
-
-function DialogeForm({ open, close, data }: any) {
-
+function DialogeForm({ open, close, data, setData, setActiveId, activeId }: any) {
+    console.log(data,"data");
+    
     const formSchema = z.object({
         firstname: z.string().min(2, {
             message: "name must be at least 2 characters.",
@@ -62,21 +64,21 @@ function DialogeForm({ open, close, data }: any) {
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            firstname: data?.name.firstname || "",
-            lastname: data?.name.firstname || "",
-            empId: data?.empId || "",
-            email: data?.email || "",
-            gender: data?.gender || "",
-            dateOfBirth: data?.dateOfBirth || "",
-            phoneNumber: data?.phoneNumber || "",
-            department: data?.department || "",
-            position: data?.position || "",
-            salary: data?.salary || "",
-        },
+        defaultValues: { 
+        firstname: data?.name?.firstname  || "",
+        lastname: data?.name?.firstname || "",
+        empId: data?.empId || "",
+        email: data?.email || "",
+        gender: data?.gender ? data?.gender : "",
+        dateOfBirth: data?.dateOfBirth || "",
+        phoneNumber: data?.phoneNumber || "",
+        department: data?.department || "",
+        position: data?.position || "",
+        salary: data?.salary || "",}
     })
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        try {
         const userData = {
             name: {
                 firstName: values.firstname,
@@ -92,27 +94,30 @@ function DialogeForm({ open, close, data }: any) {
             salary: values.salary,
         };
         console.log(userData, "entered values")
-
-        axios.post(`${BASE_URL}/users/add`, userData)
-            .then(response => {
-                console.log('added successfully:', response.data);
-                // localStorage.setItem("token", response.data.token);
-                // router.push("/dashboard")
-                close()
-            })
-            .catch(error => {
-                console.error('Error creating user:', error);
-            });
+        if (activeId === ""){
+            const data = await userService.addUser(userData);
+            console.log(data);
+        }else {
+            const data = await userService.editUser(userData, activeId);
+            console.log(data);
+        }
+      } catch (error) {
+        console.error('Error submitting form:', error);
+      }    
     }
     return (
         <div>
-            <Dialog open={open} onOpenChange={close}>
+            <Dialog open={open} onOpenChange={()=>{
+                close()
+                setData({})
+                setActiveId("")
+            }}>
                 <DialogContent style={{
                     maxWidth: "80vw",
                 }}>
 
                     <DialogHeader>
-                        <DialogTitle>Add Employee Details?</DialogTitle>
+                        <DialogTitle> {activeId === "" ? "Add" : "Edit"} Employee Details?</DialogTitle>
                     </DialogHeader>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -125,7 +130,12 @@ function DialogeForm({ open, close, data }: any) {
                                             <FormItem>
                                                 <FormLabel>First Name</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="First name" {...field} />
+                                                    <Input
+                                                    placeholder="First name" 
+                                                    {...field}
+                                                    // value={defaultValues?.firstName}
+
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -140,7 +150,10 @@ function DialogeForm({ open, close, data }: any) {
                                             <FormItem>
                                                 <FormLabel>Last Name</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="Last name" {...field} />
+                                                    <Input
+                                                    {...field}
+                                                    defaultValue={data?.name?.lastName && data?.name?.lastName}
+                                                     placeholder="Last name"  />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -155,7 +168,10 @@ function DialogeForm({ open, close, data }: any) {
                                             <FormItem>
                                                 <FormLabel>Email</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="Email" {...field} />
+                                                    <Input placeholder="Email"
+                                                    {...field}
+                                                    defaultValue={data?.email && data?.email}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -170,7 +186,10 @@ function DialogeForm({ open, close, data }: any) {
                                             <FormItem>
                                                 <FormLabel>Employee Id</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="Employee Id" {...field} />
+                                                    <Input placeholder="Employee Id"
+                                                    {...field}
+                                                    defaultValue={data?.empId && data?.empId}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -185,7 +204,10 @@ function DialogeForm({ open, close, data }: any) {
                                             <FormItem>
                                                 <FormLabel>Gender</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="gender" {...field} />
+                                                    <Input placeholder="gender" 
+                                                    {...field}
+                                                    defaultValue={data?.gender && data?.gender}
+                                                     />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -200,7 +222,10 @@ function DialogeForm({ open, close, data }: any) {
                                             <FormItem>
                                                 <FormLabel>Date Of Birth</FormLabel>
                                                 <FormControl>
-                                                    <Input type='date' placeholder="Date Of Birth" {...field} />
+                                                    <Input type='date' placeholder="Date Of Birth"
+                                                    {...field} 
+                                                    defaultValue={data?.dateOfBirth && moment(data?.dateOfBirth).format('YYYY-MM-DD')}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -215,7 +240,10 @@ function DialogeForm({ open, close, data }: any) {
                                             <FormItem>
                                                 <FormLabel>PhoneNumber</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="phoneNumber" {...field} />
+                                                    <Input placeholder="phoneNumber"
+                                                    {...field}
+                                                    defaultValue={data?.phoneNumber && data?.phoneNumber}                                                    
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -230,7 +258,10 @@ function DialogeForm({ open, close, data }: any) {
                                             <FormItem>
                                                 <FormLabel>Department</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="department" {...field} />
+                                                    <Input placeholder="department"
+                                                    {...field}
+                                                    defaultValue={data?.department && data?.department}
+                                                     />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -245,7 +276,10 @@ function DialogeForm({ open, close, data }: any) {
                                             <FormItem>
                                                 <FormLabel>Role</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="Role" {...field} />
+                                                    <Input placeholder="Role" 
+                                                    defaultValue={data?.position && data?.position}
+                                                    {...field}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -260,7 +294,10 @@ function DialogeForm({ open, close, data }: any) {
                                             <FormItem>
                                                 <FormLabel>Salary</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="salary" {...field} />
+                                                    <Input placeholder="salary" 
+                                                    {...field}
+                                                    defaultValue={data?.salary && data?.salary}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -268,7 +305,7 @@ function DialogeForm({ open, close, data }: any) {
                                     />
                                 </div>
                             </div>
-                            <Button type="submit">Submit</Button>
+                            <Button className='w-full' type="submit">Submit</Button>
                         </form>
                     </Form>
                 </DialogContent>
