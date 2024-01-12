@@ -17,31 +17,40 @@ userService.getUsersList = async () => {
 };
 
 userService.getUserById = async (id: any) => {
-    try {
-      const response = await userService.get(`/users/${id}` );
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching users list:', error);
-      throw error;
-    }
-  };
-  userService.addUser = async (userData: any) => {
-    try {
-      const response = await userService.post('/users/add', userData);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching users list:', error);
-      throw error;
-    }
-  };
-  userService.editUser = async (userData: any, id: any) => {
-    try {
-      const response = await userService.put(`/users/add${id}`, userData);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching users list:', error);
-      throw error;
-    }
-  };
+  try {
+    const response = await userService.get(`/users/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching users list:', error);
+    throw error;
+  }
+};
+userService.addUser = async (userData: any) => {
+  try {
+    const response = await userService.post('/users/add', userData);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching users list:', error);
+    throw error;
+  }
+};
+userService.editUser = async (userData: any, id: any) => {
+  try {
+    const response = await userService.put(`/users/${id}`, userData);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching users list:', error);
+    throw error;
+  }
+};
 
+userService.deleteUserById = async (id: any) => {
+  try {
+    const response = await userService.delete(`/users/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching users list:', error);
+    throw error;
+  }
+};
 export default userService;
