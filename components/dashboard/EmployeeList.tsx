@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import userService from '../../services/userservices/usersService';
 
 import axios from 'axios';
-import { DeteletIcon, PenIcon } from '../common/icons';
+import { DeletIcon, PenIcon } from '../common/icons';
 
 
 function EmployeeList({ open, setActiveId }: any) {
@@ -38,34 +38,37 @@ function EmployeeList({ open, setActiveId }: any) {
             return (
               <div
                 key={employee._id}
-                className={`border relative rounded-lg border-gray-300 transition-shadow p-4 m-4 w-64 ease-in-out hover:shadow-lg`}
+                className="bg-white border rounded-lg overflow-hidden shadow-md transition-transform transform p-4 m-4 w-64 hover:scale-105"
                 onMouseEnter={() => setHoveredCard(index)}
                 onMouseLeave={() => setHoveredCard(null)}
               >
                 <h3 className="text-xl font-semibold mb-2">
                   {employee?.name?.firstName} {employee?.name?.lastName}
                 </h3>
-                <p className="text-base mb-2">Email: {employee.email}</p>
-                <p className="text-base">Position: {employee.position}</p>
+                <p className="text-gray-600 text-base mb-2">Email: {employee.email}</p>
+                <p className="text-gray-600 text-base">Position: {employee.position}</p>
                 {hoveredCard === index && (
                   <div
                     onClick={() => {
-                      hanldEditClick(employee.empId)
+                      hanldEditClick(employee.empId);
                     }}
-                    className='absolute transition-transform transform  text-gray-500 hover:scale-105 shadow-lg ease-in-out top-0 right-0 p-2 cursor-pointer border rounded-full '>
+                    className="absolute text-gray-500 top-0 right-0 p-2 cursor-pointer rounded-full bg-gray-100 hover:bg-gray-200 transition-transform transform ease-in-out"
+                  >
                     <PenIcon />
                   </div>
                 )}
                 {hoveredCard === index && (
                   <div
                     onClick={() => {
-                      hanldDeleteClick(employee._id)
+                      hanldDeleteClick(employee._id);
                     }}
-                    className='absolute transition-transform transform  text-gray-500 hover:scale-105 shadow-lg ease-in-out bottom-0 right-0 p-2 cursor-pointer border rounded-full '>
-                    <DeteletIcon />
+                    className="absolute text-gray-500 bottom-0 right-0 p-2 cursor-pointer rounded-full bg-gray-100 hover:bg-gray-200 transition-transform transform ease-in-out"
+                  >
+                    <DeletIcon />
                   </div>
                 )}
               </div>
+
             )
           })}
       </div>
